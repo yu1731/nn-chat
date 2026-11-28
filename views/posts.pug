@@ -34,12 +34,23 @@ html(lang="ja")
             - const tooltipTitle = `<small>${post.absoluteCreatedAt}</small>`
             small.card-text.float-end(data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title=tooltipTitle) #{post.relativeCreatedAt}
           p.card-text.lead #{post.content}
+          div.d-flex.flex-wrap.gap-2.mt-2
+            each item in post.reactionSummary
+              - const btnClass = item.reactedByMe ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'
+              form(method="post" action="/posts/reaction")
+                input(type="hidden" name="postId" value=post.id)
+                input(type="hidden" name="emoji" value=item.emoji)
+                input(type="hidden" name="oneTimeToken" value=oneTimeToken)
+                button(type="submit" class=btnClass)
+                  span #{item.emoji}
+                  if item.count > 0
+                    span.ms-1 #{item.count}
         - const isDeletable = (user === post.postedBy || user === 'admin')
         if isDeletable
           div.card-footer.d-flex.justify-content-end
             form(method="post" action="/posts/delete")
               input(type="hidden" name="id" value=post.id)
-              input(type="hidden" name="oneTimeToken" value="oneTimeToken")
+              input(type="hidden" name="oneTimeToken" value=oneTimeToken)
               button(type="submit").btn.btn-outline-danger.btn-sm
                 i.bi-trash
     div.fixed-bottom.p-4.bg-body
